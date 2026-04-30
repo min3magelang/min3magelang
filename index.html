@@ -10,6 +10,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
+  function bukaPopup(src) {
+  document.getElementById('popup').style.display = 'block';
+  document.getElementById('popupImg').src = src;
+}
+
+function tutupPopup() {
+  document.getElementById('popup').style.display = 'none';
+}
 const firebaseConfig = {
   apiKey: "AIzaSyDFBto9fjDbdjxfrAK8QIZAmsgiXIjU5eQ",
   authDomain: "min3magelang-c0a1a.firebaseapp.com",
@@ -87,6 +95,7 @@ function tampilGaleri() {
 
       let img = document.createElement('img');
       img.src = data.url;
+img.onclick = () => bukaPopup(data.url);
 
       let title = document.createElement('p');
       title.textContent = data.judul;
@@ -149,9 +158,38 @@ button:hover {
   background:#c9302c;
 }
 </style>
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  padding-top: 50px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  text-align: center;
+}
 
+.popup img {
+  max-width: 80%;
+  max-height: 80%;
+  border-radius: 10px;
+}
+
+.close {
+  position: absolute;
+  top: 20px;
+  right: 40px;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+}
 </head>
-
+<div id="popup" class="popup" onclick="tutupPopup()">
+  <span class="close">&times;</span>
+  <img id="popupImg">
+</div>
 <body>
 
 <header>
