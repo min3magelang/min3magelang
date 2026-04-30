@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIN 3 Magelang | Website Resmi</title>
+  <script>
+    function login() {
+      let user = document.getElementById('user').value;
+      let pass = document.getElementById('pass').value;
+      if(user === 'admin' && pass === '12345'){
+        document.getElementById('adminPanel').style.display = 'block';
+        alert('Login berhasil');
+      } else {
+        alert('Username atau password salah');
+      }
+    }
+
+    function tambahPengumuman(){
+      let isi = document.getElementById('inputPengumuman').value;
+      let list = document.getElementById('listPengumuman');
+      let item = document.createElement('li');
+      item.textContent = isi;
+      list.appendChild(item);
+    }
+  </script>
+  <style>
+    body {font-family: Arial; margin:0; background:#eef2f7;}
+    header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
+    nav {background:#123d82; padding:10px; text-align:center;}
+    nav a {color:white; margin:10px; text-decoration:none;}
+    .container {padding:20px; max-width:900px; margin:auto;}
+    .card {background:white; padding:20px; border-radius:10px; margin-bottom:15px;}
+    #adminPanel {display:none; background:#fff3cd; padding:15px; border-radius:10px;}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>MIN 3 MAGELANG</h1>
+</header>
+
+<nav>
+  <a href="#">Beranda</a>
+  <a href="#admin">Admin</a>
+</nav>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Login Admin</h2>
+    <input type="text" id="user" placeholder="Username"><br><br>
+    <input type="password" id="pass" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+  </div>
+
+  <div id="adminPanel" class="card">
+    <h2>Panel Admin</h2>
+    <h3>Tambah Pengumuman</h3>
+    <input type="text" id="inputPengumuman" placeholder="Tulis pengumuman">
+    <button onclick="tambahPengumuman()">Tambah</button>
+  </div>
+
+  <div class="card">
+    <h2>Pengumuman</h2>
+    <ul id="listPengumuman">
+      <li>Selamat datang di website MIN 3 Magelang</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
