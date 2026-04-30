@@ -1,122 +1,172 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIN 3 Magelang</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIN 3 Magelang</title>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDFBto9fjDbdjxfrAK8QIZAmsgiXIjU5eQ",
-      authDomain: "min3magelang-c0a1a.firebaseapp.com",
-      databaseURL: "https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "min3magelang-c0a1a",
-      storageBucket: "min3magelang-c0a1a.firebasestorage.app",
-      messagingSenderId: "465060029478",
-      appId: "1:465060029478:web:48c8f17b2e151baa8c32e7"
-    };
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDFBto9fjDbdjxfrAK8QIZAmsgiXIjU5eQ",
+  authDomain: "min3magelang-c0a1a.firebaseapp.com",
+  databaseURL: "https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "min3magelang-c0a1a",
+  storageBucket: "min3magelang-c0a1a.firebasestorage.app",
+  messagingSenderId: "465060029478",
+  appId: "1:465060029478:web:48c8f17b2e151baa8c32e7"
+};
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    // LOGIN
-    function login() {
-      const email = document.getElementById('email').value;
-      const pass = document.getElementById('password').value;
+// LOGIN
+function login() {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
 
-      firebase.auth().signInWithEmailAndPassword(email, pass)
-        .then(() => {
-          alert('Login berhasil');
-        })
-        .catch(() => alert('Login gagal'));
-    }
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+    .then(() => alert('Login berhasil'))
+    .catch(() => alert('Login gagal'));
+}
 
-    // LOGOUT
-    function logout() {
-      firebase.auth().signOut();
-    }
+// LOGOUT
+function logout() {
+  firebase.auth().signOut();
+}
 
-    // CEK LOGIN OTOMATIS
-    firebase.auth().onAuthStateChanged(function(user) {
-      if (user) {
-        document.getElementById('adminPanel').style.display = 'block';
-      } else {
-        document.getElementById('adminPanel').style.display = 'none';
-      }
+// CEK LOGIN
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    document.getElementById('adminPanel').style.display = 'block';
+  } else {
+    document.getElementById('adminPanel').style.display = 'none';
+  }
+});
+
+// TAMBAH PENGUMUMAN
+function tambahPengumuman() {
+  let isi = document.getElementById('inputPengumuman').value;
+  if (isi === "") return alert("Isi dulu!");
+
+  db.ref('pengumuman').push({ text: isi });
+  document.getElementById('inputPengumuman').value = "";
+}
+
+// TAMPIL PENGUMUMAN
+function tampilPengumuman() {
+  const list = document.getElementById('listPengumuman');
+
+  db.ref('pengumuman').on('value', (snapshot) => {
+    list.innerHTML = "";
+    snapshot.forEach(child => {
+      let li = document.createElement('li');
+      li.textContent = child.val().text;
+      list.appendChild(li);
     });
+  });
+}
 
-    // TAMBAH DATA
-    function tambahPengumuman() {
-      let isi = document.getElementById('inputPengumuman').value;
-      if (isi === "") return alert("Isi dulu!");
+// TAMBAH FOTO (LINK)
+function tambahFoto() {
+  const judul = document.getElementById('judulFoto').value;
+  const link = document.getElementById('linkFoto').value;
 
-      db.ref('pengumuman').push({
-        text: isi
-      });
+  if (judul === "" || link === "") return alert("Isi semua!");
 
-      document.getElementById('inputPengumuman').value = "";
-    }
+  db.ref('galeri').push({
+    judul: judul,
+    url: link
+  });
 
-    // TAMPIL DATA
-    function tampilPengumuman() {
-      const list = document.getElementById('listPengumuman');
+  document.getElementById('judulFoto').value = "";
+  document.getElementById('linkFoto').value = "";
+}
 
-      db.ref('pengumuman').on('value', (snapshot) => {
-        list.innerHTML = "";
-        snapshot.forEach(child => {
-          let li = document.createElement('li');
-          li.textContent = child.val().text;
-          list.appendChild(li);
-        });
-      });
-    }
+// TAMPIL GALERI
+function tampilGaleri() {
+  const galeri = document.getElementById('galeri');
 
-    window.onload = tampilPengumuman;
-  </script>
+  db.ref('galeri').on('value', snapshot => {
+    galeri.innerHTML = "";
 
-  <style>
-    body {font-family: Arial; background:#eef2f7; margin:0;}
-    header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
-    .container {max-width:900px; margin:auto; padding:20px;}
-    .card {background:white; padding:20px; border-radius:10px; margin-bottom:15px;}
-    button {padding:8px 12px; margin-right:5px;}
-  </style>
+    snapshot.forEach(child => {
+      const data = child.val();
+
+      let div = document.createElement('div');
+      div.style.marginBottom = "10px";
+
+      let img = document.createElement('img');
+      img.src = data.url;
+      img.style.width = "150px";
+      img.style.borderRadius = "8px";
+
+      let p = document.createElement('p');
+      p.textContent = data.judul;
+
+      div.appendChild(img);
+      div.appendChild(p);
+      galeri.appendChild(div);
+    });
+  });
+}
+
+window.onload = function() {
+  tampilPengumuman();
+  tampilGaleri();
+};
+</script>
+
+<style>
+body {font-family: Arial; background:#eef2f7; margin:0;}
+header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
+.container {max-width:900px; margin:auto; padding:20px;}
+.card {background:white; padding:20px; border-radius:10px; margin-bottom:15px;}
+img {margin-top:5px;}
+</style>
+
 </head>
 
 <body>
 
 <header>
-  <h1>MIN 3 MAGELANG</h1>
+<h1>MIN 3 MAGELANG</h1>
 </header>
 
 <div class="container">
 
-  <!-- LOGIN -->
-  <div class="card">
-    <h2>Login Admin</h2>
-    <input type="email" id="email" placeholder="Email"><br><br>
-    <input type="password" id="password" placeholder="Password"><br><br>
-    <button onclick="login()">Login</button>
-    <button onclick="logout()">Logout</button>
-  </div>
+<div class="card">
+<h2>Login Admin</h2>
+<input type="email" id="email" placeholder="Email"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
+<button onclick="login()">Login</button>
+<button onclick="logout()">Logout</button>
+</div>
 
-  <!-- ADMIN PANEL (TERSEMBUNYI) -->
-  <div id="adminPanel" class="card" style="display:none;">
-    <h2>Tambah Pengumuman</h2>
-    <input type="text" id="inputPengumuman" placeholder="Tulis pengumuman">
-    <button onclick="tambahPengumuman()">Tambah</button>
-  </div>
+<div id="adminPanel" class="card" style="display:none;">
+<h2>Tambah Pengumuman</h2>
+<input type="text" id="inputPengumuman">
+<button onclick="tambahPengumuman()">Tambah</button>
 
-  <!-- DATA -->
-  <div class="card">
-    <h2>Pengumuman</h2>
-    <ul id="listPengumuman"></ul>
-  </div>
+<h2>Tambah Foto Galeri</h2>
+<input type="text" id="judulFoto" placeholder="Judul foto"><br><br>
+<input type="text" id="linkFoto" placeholder="Link gambar"><br><br>
+<button onclick="tambahFoto()">Tambah Foto</button>
+</div>
+
+<div class="card">
+<h2>Pengumuman</h2>
+<ul id="listPengumuman"></ul>
+</div>
+
+<div class="card">
+<h2>Galeri Sekolah</h2>
+<div id="galeri"></div>
+</div>
 
 </div>
 
