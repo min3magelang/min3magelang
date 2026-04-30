@@ -9,216 +9,215 @@
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
-<script>
-  function bukaPopup(src) {
-  document.getElementById('popup').style.display = 'block';
-  document.getElementById('popupImg').src = src;
-}
-
-function tutupPopup() {
-  document.getElementById('popup').style.display = 'none';
-}
-const firebaseConfig = {
-  apiKey: "AIzaSyDFBto9fjDbdjxfrAK8QIZAmsgiXIjU5eQ",
-  authDomain: "min3magelang-c0a1a.firebaseapp.com",
-  databaseURL: "https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "min3magelang-c0a1a",
-  storageBucket: "min3magelang-c0a1a.firebasestorage.app",
-  messagingSenderId: "465060029478",
-  appId: "1:465060029478:web:48c8f17b2e151baa8c32e7"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-let isAdmin = false;
-
-// LOGIN
-function login() {
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-
-  firebase.auth().signInWithEmailAndPassword(email, pass)
-    .then(() => alert('Login berhasil'))
-    .catch(() => alert('Login gagal'));
-}
-
-// LOGOUT
-function logout() {
-  firebase.auth().signOut();
-}
-
-// CEK LOGIN
-firebase.auth().onAuthStateChanged(function(user) {
-  if (user) {
-    isAdmin = true;
-    document.getElementById('adminPanel').style.display = 'block';
-  } else {
-    isAdmin = false;
-    document.getElementById('adminPanel').style.display = 'none';
-  }
-});
-
-// TAMBAH FOTO
-function tambahFoto() {
-  const judul = document.getElementById('judulFoto').value;
-  const link = document.getElementById('linkFoto').value;
-
-  if (judul === "" || link === "") return alert("Isi semua!");
-
-  db.ref('galeri').push({ judul, url: link });
-
-  document.getElementById('judulFoto').value = "";
-  document.getElementById('linkFoto').value = "";
-}
-
-// HAPUS FOTO
-function hapusFoto(id) {
-  if (confirm("Hapus foto ini?")) {
-    db.ref('galeri/' + id).remove();
-  }
-}
-
-// TAMPIL GALERI
-function tampilGaleri() {
-  const galeri = document.getElementById('galeri');
-
-  db.ref('galeri').on('value', snapshot => {
-    galeri.innerHTML = "";
-
-    snapshot.forEach(child => {
-      const data = child.val();
-      const id = child.key;
-
-      let card = document.createElement('div');
-      card.className = "foto-card";
-
-      let img = document.createElement('img');
-      img.src = data.url;
-img.onclick = () => bukaPopup(data.url);
-
-      let title = document.createElement('p');
-      title.textContent = data.judul;
-
-      card.appendChild(img);
-      card.appendChild(title);
-
-      // tombol hapus hanya admin
-      if (isAdmin) {
-        let btn = document.createElement('button');
-        btn.textContent = "Hapus";
-        btn.onclick = () => hapusFoto(id);
-        card.appendChild(btn);
-      }
-
-      galeri.appendChild(card);
-    });
-  });
-}
-
-window.onload = tampilGaleri;
-</script>
-
 <style>
-body {font-family: Arial; background:#eef2f7; margin:0;}
-header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
+body {font-family:'Segoe UI'; background:#f4f6f9; margin:0;}
+header {background:linear-gradient(135deg,#1a5bb8,#4a90e2); color:white; padding:20px; text-align:center;}
+.nav {text-align:center; background:white; padding:10px;}
+.nav button {margin:5px; padding:8px 15px; background:#1a5bb8; color:white; border:none; border-radius:6px;}
 .container {max-width:1000px; margin:auto; padding:20px;}
-.card {background:white; padding:20px; border-radius:10px; margin-bottom:20px;}
+.card {background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.08);}
 
-#galeri {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-}
+#galeri {display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:20px;}
+.foto-card img {width:100%; height:150px; object-fit:cover; border-radius:10px;}
 
-.foto-card {
-  background:white;
-  padding:10px;
-  border-radius:10px;
-  text-align:center;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
-}
+.popup {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center;}
+.popup img {max-width:90%; max-height:70vh;}
+.navPopup {position:absolute; top:50%; font-size:40px; color:white; cursor:pointer;}
+.prev {left:20px;} .next {right:20px;}
 
-.foto-card img {
-  width:100%;
-  border-radius:8px;
-}
+.img-berita {width:100%; height:180px; object-fit:cover; border-radius:10px;}
+.img-detail {width:100%; max-height:300px; object-fit:cover; border-radius:10px;}
 
-button {
-  margin-top:5px;
-  padding:5px 8px;
-  background:#d9534f;
-  color:white;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-button:hover {
-  background:#c9302c;
-}
+button {background:#1a5bb8; color:white; border:none; padding:8px; border-radius:6px; cursor:pointer;}
 </style>
-.popup {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  padding-top: 50px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  text-align: center;
-}
-
-.popup img {
-  max-width: 80%;
-  max-height: 80%;
-  border-radius: 10px;
-}
-
-.close {
-  position: absolute;
-  top: 20px;
-  right: 40px;
-  color: white;
-  font-size: 40px;
-  cursor: pointer;
-}
 </head>
-<div id="popup" class="popup" onclick="tutupPopup()">
-  <span class="close">&times;</span>
-  <img id="popupImg">
-</div>
+
 <body>
 
-<header>
-<h1>MIN 3 MAGELANG</h1>
-</header>
+<header><h1>MIN 3 MAGELANG</h1></header>
+
+<div class="nav">
+<button onclick="showPage('home')">Beranda</button>
+<button onclick="showPage('galeri')">Galeri</button>
+<button onclick="showPage('berita')">Berita</button>
+</div>
 
 <div class="container">
 
 <div class="card">
 <h2>Login Admin</h2>
-<input type="email" id="email" placeholder="Email"><br><br>
-<input type="password" id="password" placeholder="Password"><br><br>
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
 <button onclick="login()">Login</button>
 <button onclick="logout()">Logout</button>
 </div>
 
-<div id="adminPanel" class="card" style="display:none;">
-<h2>Tambah Foto</h2>
-<input type="text" id="judulFoto" placeholder="Judul foto"><br><br>
-<input type="text" id="linkFoto" placeholder="Link gambar"><br><br>
-<button onclick="tambahFoto()">Tambah</button>
-</div>
-
+<!-- GALERI -->
+<div id="page-galeri">
 <div class="card">
-<h2>Galeri Sekolah</h2>
-<div id="galeri"></div>
+<h2>Filter</h2>
+<input id="filterText" placeholder="Cari...">
+<input type="month" id="filterBulan">
+<button onclick="applyFilter()">Filter</button>
+</div>
+
+<div id="adminPanel" class="card" style="display:none;">
+<input id="judulFoto" placeholder="Judul"><br><br>
+<input type="date" id="tanggalFoto"><br><br>
+<input id="linkFoto" placeholder="Link gambar"><br><br>
+<button onclick="tambahFoto()">Tambah Foto</button>
+</div>
+
+<div class="card"><div id="galeri"></div></div>
+</div>
+
+<!-- BERITA -->
+<div id="page-berita" style="display:none;">
+<div class="card">
+<input id="judulBerita" placeholder="Judul"><br><br>
+<input type="date" id="tanggalBerita"><br><br>
+<input id="gambarBerita" placeholder="Link gambar"><br><br>
+<textarea id="isiBerita"></textarea><br><br>
+<button onclick="tambahBerita()">Simpan</button>
+</div>
+
+<div class="card"><div id="listBerita"></div></div>
+</div>
+
+<!-- DETAIL -->
+<div id="page-detail" style="display:none;">
+<div class="card">
+<button onclick="kembaliKeBerita()">Kembali</button>
+<h2 id="detailJudul"></h2>
+<small id="detailTanggal"></small>
+<div id="detailIsi"></div>
+</div>
 </div>
 
 </div>
+
+<!-- POPUP -->
+<div id="popup" class="popup">
+<span class="navPopup prev" onclick="prevFoto()">❮</span>
+<img id="popupImg">
+<span class="navPopup next" onclick="nextFoto()">❯</span>
+</div>
+
+<script>
+const config = {
+apiKey:"AIzaSyDF...",
+authDomain:"min3magelang-c0a1a.firebaseapp.com",
+databaseURL:"https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+firebase.initializeApp(config);
+const db = firebase.database();
+
+let dataGaleri=[],index=0,isAdmin=false;
+
+// LOGIN
+function login(){firebase.auth().signInWithEmailAndPassword(email.value,password.value)}
+function logout(){firebase.auth().signOut()}
+firebase.auth().onAuthStateChanged(u=>{
+isAdmin=!!u;
+adminPanel.style.display=u?"block":"none";
+});
+
+// GALERI
+function tambahFoto(){
+db.ref('galeri').push({
+judul:judulFoto.value,
+tanggal:tanggalFoto.value,
+url:linkFoto.value
+});
+}
+
+function tampilGaleri(){
+db.ref('galeri').on('value',snap=>{
+dataGaleri=[];
+galeri.innerHTML="";
+snap.forEach(c=>{
+let d=c.val(); d.id=c.key; dataGaleri.push(d);
+let el=document.createElement('div');
+el.innerHTML=`<img src="${d.url}"><p>${d.judul}</p><small>${d.tanggal}</small>`;
+el.onclick=()=>openPopup(d);
+galeri.appendChild(el);
+});
+});
+}
+
+function openPopup(d){
+index=dataGaleri.indexOf(d);
+popup.style.display="flex";
+popupImg.src=d.url;
+}
+function nextFoto(){index=(index+1)%dataGaleri.length; popupImg.src=dataGaleri[index].url;}
+function prevFoto(){index=(index-1+dataGaleri.length)%dataGaleri.length; popupImg.src=dataGaleri[index].url;}
+
+// FILTER
+function applyFilter(){
+let t=filterText.value.toLowerCase();
+let b=filterBulan.value;
+let hasil=dataGaleri.filter(d=>d.judul.toLowerCase().includes(t)&&(b==""||d.tanggal.startsWith(b)));
+galeri.innerHTML="";
+hasil.forEach(d=>{
+let el=document.createElement('div');
+el.innerHTML=`<img src="${d.url}"><p>${d.judul}</p>`;
+galeri.appendChild(el);
+});
+}
+
+// BERITA
+function tambahBerita(){
+db.ref('berita').push({
+judul:judulBerita.value,
+tanggal:tanggalBerita.value,
+isi:isiBerita.value,
+gambar:gambarBerita.value
+});
+}
+
+function tampilBerita(){
+db.ref('berita').on('value',snap=>{
+listBerita.innerHTML="";
+snap.forEach(c=>{
+let d=c.val();
+listBerita.innerHTML+=`
+<div class="card">
+<img src="${d.gambar}" class="img-berita">
+<h3>${d.judul}</h3>
+<small>${d.tanggal}</small>
+<p>${d.isi.substring(0,100)}...</p>
+<button onclick='detail(${JSON.stringify(d)})'>Baca</button>
+</div>`;
+});
+});
+}
+
+function detail(d){
+page-berita.style.display="none";
+page-detail.style.display="block";
+detailJudul.innerText=d.judul;
+detailTanggal.innerText=d.tanggal;
+detailIsi.innerHTML=`<img src="${d.gambar}" class="img-detail"><p>${d.isi}</p>`;
+}
+
+function kembaliKeBerita(){
+page-detail.style.display="none";
+page-berita.style.display="block";
+}
+
+// NAV
+function showPage(p){
+page-galeri.style.display="none";
+page-berita.style.display="none";
+page-detail.style.display="none";
+if(p=="galeri") page-galeri.style.display="block";
+if(p=="berita") page-berita.style.display="block";
+}
+
+// LOAD
+window.onload=()=>{tampilGaleri(); tampilBerita();}
+</script>
 
 </body>
 </html>
