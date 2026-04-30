@@ -1,74 +1,206 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIN 3 Magelang | Website Resmi</title>
-  <script>
-    function login() {
-      let user = document.getElementById('user').value;
-      let pass = document.getElementById('pass').value;
-      if(user === 'admin' && pass === '12345'){
-        document.getElementById('adminPanel').style.display = 'block';
-        alert('Login berhasil');
-      } else {
-        alert('Username atau password salah');
-      }
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin MIN 3 Magelang</title>
 
-    function tambahPengumuman(){
-      let isi = document.getElementById('inputPengumuman').value;
-      let list = document.getElementById('listPengumuman');
-      let item = document.createElement('li');
-      item.textContent = isi;
-      list.appendChild(item);
-    }
-  </script>
-  <style>
-    body {font-family: Arial; margin:0; background:#eef2f7;}
-    header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
-    nav {background:#123d82; padding:10px; text-align:center;}
-    nav a {color:white; margin:10px; text-decoration:none;}
-    .container {padding:20px; max-width:900px; margin:auto;}
-    .card {background:white; padding:20px; border-radius:10px; margin-bottom:15px;}
-    #adminPanel {display:none; background:#fff3cd; padding:15px; border-radius:10px;}
-  </style>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<style>
+body {margin:0; font-family:Segoe UI; display:flex;}
+
+.sidebar {
+  width:220px;
+  background:#1a5bb8;
+  color:white;
+  height:100vh;
+  padding:20px;
+}
+
+.sidebar h2 {margin-top:0;}
+
+.sidebar button {
+  width:100%;
+  margin:5px 0;
+  padding:10px;
+  border:none;
+  background:#144a96;
+  color:white;
+  cursor:pointer;
+}
+
+.main {
+  flex:1;
+  padding:20px;
+  background:#f4f6f9;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+}
+
+input, textarea {
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
+
+button {
+  padding:8px 12px;
+  cursor:pointer;
+}
+</style>
 </head>
+
 <body>
 
-<header>
-  <h1>MIN 3 MAGELANG</h1>
-</header>
+<div class="sidebar">
+<h2>Admin Panel</h2>
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('galeri')">Galeri</button>
+<button onclick="show('berita')">Berita</button>
+<button onclick="logout()">Logout</button>
+</div>
 
-<nav>
-  <a href="#">Beranda</a>
-  <a href="#admin">Admin</a>
-</nav>
+<div class="main">
 
-<div class="container">
+<!-- LOGIN -->
+<div id="loginPage" class="card">
+<h3>Login Admin</h3>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
 
-  <div class="card">
-    <h2>Login Admin</h2>
-    <input type="text" id="user" placeholder="Username"><br><br>
-    <input type="password" id="pass" placeholder="Password"><br><br>
-    <button onclick="login()">Login</button>
-  </div>
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;">
+<div class="card">
+<h2>Selamat Datang Admin</h2>
+<p>Kelola website MIN 3 Magelang</p>
+</div>
+</div>
 
-  <div id="adminPanel" class="card">
-    <h2>Panel Admin</h2>
-    <h3>Tambah Pengumuman</h3>
-    <input type="text" id="inputPengumuman" placeholder="Tulis pengumuman">
-    <button onclick="tambahPengumuman()">Tambah</button>
-  </div>
+<!-- GALERI -->
+<div id="galeri" style="display:none;">
+<div class="card">
+<h3>Tambah Foto</h3>
+<input id="judulFoto" placeholder="Judul">
+<input id="linkFoto" placeholder="Link gambar">
+<button onclick="tambahFoto()">Tambah</button>
+</div>
 
-  <div class="card">
-    <h2>Pengumuman</h2>
-    <ul id="listPengumuman">
-      <li>Selamat datang di website MIN 3 Magelang</li>
-    </ul>
-  </div>
+<div class="card">
+<h3>Data Galeri</h3>
+<div id="listGaleri"></div>
+</div>
+</div>
+
+<!-- BERITA -->
+<div id="berita" style="display:none;">
+<div class="card">
+<h3>Tambah Berita</h3>
+<input id="judulBerita" placeholder="Judul">
+<input type="date" id="tanggalBerita">
+<input id="gambarBerita" placeholder="Link gambar">
+<textarea id="isiBerita"></textarea>
+<button onclick="tambahBerita()">Simpan</button>
+</div>
+
+<div class="card">
+<h3>Data Berita</h3>
+<div id="listBerita"></div>
+</div>
+</div>
 
 </div>
+
+<script>
+const config = {
+apiKey:"AIzaSyDF...",
+authDomain:"min3magelang-c0a1a.firebaseapp.com",
+databaseURL:"https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+firebase.initializeApp(config);
+const db = firebase.database();
+
+// LOGIN
+function login(){
+firebase.auth().signInWithEmailAndPassword(email.value,password.value)
+.then(()=>{
+loginPage.style.display="none";
+dashboard.style.display="block";
+})
+.catch(()=>alert("Login gagal"));
+}
+
+function logout(){
+firebase.auth().signOut();
+location.reload();
+}
+
+// NAV
+function show(p){
+['dashboard','galeri','berita'].forEach(id=>{
+document.getElementById(id).style.display='none';
+});
+document.getElementById(p).style.display='block';
+}
+
+// GALERI
+function tambahFoto(){
+db.ref('galeri').push({
+judul:judulFoto.value,
+url:linkFoto.value
+});
+}
+
+db.ref('galeri').on('value',snap=>{
+listGaleri.innerHTML="";
+snap.forEach(c=>{
+let d=c.val();
+listGaleri.innerHTML+=`
+<div class="card">
+<img src="${d.url}" width="100%">
+<p>${d.judul}</p>
+<button onclick="hapus('${c.key}','galeri')">Hapus</button>
+</div>`;
+});
+});
+
+// BERITA
+function tambahBerita(){
+db.ref('berita').push({
+judul:judulBerita.value,
+tanggal:tanggalBerita.value,
+isi:isiBerita.value,
+gambar:gambarBerita.value
+});
+}
+
+db.ref('berita').on('value',snap=>{
+listBerita.innerHTML="";
+snap.forEach(c=>{
+let d=c.val();
+listBerita.innerHTML+=`
+<div class="card">
+<h4>${d.judul}</h4>
+<button onclick="hapus('${c.key}','berita')">Hapus</button>
+</div>`;
+});
+});
+
+// HAPUS
+function hapus(id,tipe){
+db.ref(tipe+'/'+id).remove();
+}
+</script>
 
 </body>
 </html>
