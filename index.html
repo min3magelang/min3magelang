@@ -7,216 +7,213 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <style>
-body {font-family:'Segoe UI'; background:#f4f6f9; margin:0;}
-header {background:linear-gradient(135deg,#1a5bb8,#4a90e2); color:white; padding:20px; text-align:center;}
-.nav {text-align:center; background:white; padding:10px;}
-.nav button {margin:5px; padding:8px 15px; background:#1a5bb8; color:white; border:none; border-radius:6px;}
-.container {max-width:1000px; margin:auto; padding:20px;}
-.card {background:white; padding:20px; border-radius:12px; margin-bottom:20px; box-shadow:0 4px 12px rgba(0,0,0,0.08);}
+body {margin:0; font-family:'Segoe UI'; background:#f4f6f9;}
 
-#galeri {display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:20px;}
-.foto-card img {width:100%; height:150px; object-fit:cover; border-radius:10px;}
+header {
+  background:#1a5bb8;
+  color:white;
+  padding:15px;
+}
 
-.popup {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); justify-content:center; align-items:center;}
-.popup img {max-width:90%; max-height:70vh;}
-.navPopup {position:absolute; top:50%; font-size:40px; color:white; cursor:pointer;}
-.prev {left:20px;} .next {right:20px;}
+.navbar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-.img-berita {width:100%; height:180px; object-fit:cover; border-radius:10px;}
-.img-detail {width:100%; max-height:300px; object-fit:cover; border-radius:10px;}
+.navbar h2 {margin:0;}
 
-button {background:#1a5bb8; color:white; border:none; padding:8px; border-radius:6px; cursor:pointer;}
+.menu a {
+  color:white;
+  margin:0 10px;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.menu a:hover {text-decoration:underline;}
+
+.container {padding:20px; max-width:1100px; margin:auto;}
+
+.hero {
+  background:url('https://images.unsplash.com/photo-1588072432836-e10032774350') center/cover;
+  color:white;
+  padding:80px 20px;
+  text-align:center;
+  border-radius:10px;
+}
+
+.card {
+  background:white;
+  padding:20px;
+  margin-top:20px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:15px;
+}
+
+.grid img {
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.footer {
+  background:#1a5bb8;
+  color:white;
+  text-align:center;
+  padding:15px;
+  margin-top:30px;
+}
 </style>
 </head>
 
 <body>
 
-<header><h1>MIN 3 MAGELANG</h1></header>
-
-<div class="nav">
-<button onclick="showPage('home')">Beranda</button>
-<button onclick="showPage('galeri')">Galeri</button>
-<button onclick="showPage('berita')">Berita</button>
+<header>
+<div class="navbar">
+<h2>MIN 3 MAGELANG</h2>
+<div class="menu">
+<a onclick="show('home')">Beranda</a>
+<a onclick="show('profil')">Profil</a>
+<a onclick="show('guru')">Guru</a>
+<a onclick="show('galeri')">Galeri</a>
+<a onclick="show('berita')">Berita</a>
+<a onclick="show('kontak')">Kontak</a>
 </div>
+</div>
+</header>
 
 <div class="container">
 
+<!-- BERANDA -->
+<div id="home">
+<div class="hero">
+<h1>Selamat Datang di MIN 3 Magelang</h1>
+<p>Mewujudkan Generasi Islami, Cerdas, dan Berprestasi</p>
+</div>
+
 <div class="card">
-<h2>Login Admin</h2>
-<input id="email" placeholder="Email"><br><br>
-<input id="password" type="password" placeholder="Password"><br><br>
-<button onclick="login()">Login</button>
-<button onclick="logout()">Logout</button>
+<h2>Sambutan Kepala Madrasah</h2>
+<p>Assalamu’alaikum Wr. Wb.  
+Selamat datang di website resmi MIN 3 Magelang...</p>
+</div>
+</div>
+
+<!-- PROFIL -->
+<div id="profil" style="display:none;">
+<div class="card">
+<h2>Profil Sekolah</h2>
+<p>Nama: MIN 3 Magelang</p>
+<p>Alamat: Secang, Kabupaten Magelang</p>
+<p>Visi: Unggul dalam prestasi dan berakhlak mulia</p>
+</div>
+</div>
+
+<!-- GURU -->
+<div id="guru" style="display:none;">
+<div class="card">
+<h2>Data Guru</h2>
+<p>Silakan tambahkan data guru di sini.</p>
+</div>
 </div>
 
 <!-- GALERI -->
-<div id="page-galeri">
+<div id="galeri" style="display:none;">
 <div class="card">
-<h2>Filter</h2>
-<input id="filterText" placeholder="Cari...">
-<input type="month" id="filterBulan">
-<button onclick="applyFilter()">Filter</button>
+<h2>Galeri Sekolah</h2>
+<div class="grid" id="galeriList"></div>
 </div>
-
-<div id="adminPanel" class="card" style="display:none;">
-<input id="judulFoto" placeholder="Judul"><br><br>
-<input type="date" id="tanggalFoto"><br><br>
-<input id="linkFoto" placeholder="Link gambar"><br><br>
-<button onclick="tambahFoto()">Tambah Foto</button>
-</div>
-
-<div class="card"><div id="galeri"></div></div>
 </div>
 
 <!-- BERITA -->
-<div id="page-berita" style="display:none;">
+<div id="berita" style="display:none;">
 <div class="card">
-<input id="judulBerita" placeholder="Judul"><br><br>
-<input type="date" id="tanggalBerita"><br><br>
-<input id="gambarBerita" placeholder="Link gambar"><br><br>
-<textarea id="isiBerita"></textarea><br><br>
-<button onclick="tambahBerita()">Simpan</button>
+<h2>Berita Sekolah</h2>
+<div id="beritaList"></div>
 </div>
-
-<div class="card"><div id="listBerita"></div></div>
 </div>
 
 <!-- DETAIL -->
-<div id="page-detail" style="display:none;">
+<div id="detail" style="display:none;">
 <div class="card">
-<button onclick="kembaliKeBerita()">Kembali</button>
-<h2 id="detailJudul"></h2>
-<small id="detailTanggal"></small>
-<div id="detailIsi"></div>
+<button onclick="show('berita')">← Kembali</button>
+<h2 id="dJudul"></h2>
+<p id="dTanggal"></p>
+<img id="dGambar" style="width:100%; border-radius:10px;">
+<p id="dIsi"></p>
+</div>
+</div>
+
+<!-- KONTAK -->
+<div id="kontak" style="display:none;">
+<div class="card">
+<h2>Kontak</h2>
+<p>Email: min3magelang@gmail.com</p>
+<p>Alamat: Magelang</p>
 </div>
 </div>
 
 </div>
 
-<!-- POPUP -->
-<div id="popup" class="popup">
-<span class="navPopup prev" onclick="prevFoto()">❮</span>
-<img id="popupImg">
-<span class="navPopup next" onclick="nextFoto()">❯</span>
+<div class="footer">
+© 2026 MIN 3 Magelang
 </div>
 
 <script>
-const config = {
+const firebaseConfig = {
 apiKey:"AIzaSyDF...",
-authDomain:"min3magelang-c0a1a.firebaseapp.com",
 databaseURL:"https://min3magelang-c0a1a-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
-firebase.initializeApp(config);
+
+firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let dataGaleri=[],index=0,isAdmin=false;
-
-// LOGIN
-function login(){firebase.auth().signInWithEmailAndPassword(email.value,password.value)}
-function logout(){firebase.auth().signOut()}
-firebase.auth().onAuthStateChanged(u=>{
-isAdmin=!!u;
-adminPanel.style.display=u?"block":"none";
-});
+// NAVIGASI
+function show(id){
+['home','profil','guru','galeri','berita','kontak','detail']
+.forEach(p=>document.getElementById(p).style.display='none');
+document.getElementById(id).style.display='block';
+}
 
 // GALERI
-function tambahFoto(){
-db.ref('galeri').push({
-judul:judulFoto.value,
-tanggal:tanggalFoto.value,
-url:linkFoto.value
-});
-}
-
-function tampilGaleri(){
 db.ref('galeri').on('value',snap=>{
-dataGaleri=[];
-galeri.innerHTML="";
-snap.forEach(c=>{
-let d=c.val(); d.id=c.key; dataGaleri.push(d);
-let el=document.createElement('div');
-el.innerHTML=`<img src="${d.url}"><p>${d.judul}</p><small>${d.tanggal}</small>`;
-el.onclick=()=>openPopup(d);
-galeri.appendChild(el);
-});
-});
-}
-
-function openPopup(d){
-index=dataGaleri.indexOf(d);
-popup.style.display="flex";
-popupImg.src=d.url;
-}
-function nextFoto(){index=(index+1)%dataGaleri.length; popupImg.src=dataGaleri[index].url;}
-function prevFoto(){index=(index-1+dataGaleri.length)%dataGaleri.length; popupImg.src=dataGaleri[index].url;}
-
-// FILTER
-function applyFilter(){
-let t=filterText.value.toLowerCase();
-let b=filterBulan.value;
-let hasil=dataGaleri.filter(d=>d.judul.toLowerCase().includes(t)&&(b==""||d.tanggal.startsWith(b)));
-galeri.innerHTML="";
-hasil.forEach(d=>{
-let el=document.createElement('div');
-el.innerHTML=`<img src="${d.url}"><p>${d.judul}</p>`;
-galeri.appendChild(el);
-});
-}
-
-// BERITA
-function tambahBerita(){
-db.ref('berita').push({
-judul:judulBerita.value,
-tanggal:tanggalBerita.value,
-isi:isiBerita.value,
-gambar:gambarBerita.value
-});
-}
-
-function tampilBerita(){
-db.ref('berita').on('value',snap=>{
-listBerita.innerHTML="";
+galeriList.innerHTML="";
 snap.forEach(c=>{
 let d=c.val();
-listBerita.innerHTML+=`
+galeriList.innerHTML+=`<img src="${d.url}">`;
+});
+});
+
+// BERITA
+db.ref('berita').on('value',snap=>{
+beritaList.innerHTML="";
+snap.forEach(c=>{
+let d=c.val();
+beritaList.innerHTML+=`
 <div class="card">
-<img src="${d.gambar}" class="img-berita">
 <h3>${d.judul}</h3>
-<small>${d.tanggal}</small>
+<p>${d.tanggal}</p>
 <p>${d.isi.substring(0,100)}...</p>
 <button onclick='detail(${JSON.stringify(d)})'>Baca</button>
 </div>`;
 });
 });
-}
 
 function detail(d){
-page-berita.style.display="none";
-page-detail.style.display="block";
-detailJudul.innerText=d.judul;
-detailTanggal.innerText=d.tanggal;
-detailIsi.innerHTML=`<img src="${d.gambar}" class="img-detail"><p>${d.isi}</p>`;
+show('detail');
+dJudul.innerText=d.judul;
+dTanggal.innerText=d.tanggal;
+dGambar.src=d.gambar;
+dIsi.innerText=d.isi;
 }
-
-function kembaliKeBerita(){
-page-detail.style.display="none";
-page-berita.style.display="block";
-}
-
-// NAV
-function showPage(p){
-page-galeri.style.display="none";
-page-berita.style.display="none";
-page-detail.style.display="none";
-if(p=="galeri") page-galeri.style.display="block";
-if(p=="berita") page-berita.style.display="block";
-}
-
-// LOAD
-window.onload=()=>{tampilGaleri(); tampilBerita();}
 </script>
 
 </body>
