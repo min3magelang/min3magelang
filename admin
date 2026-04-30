@@ -132,13 +132,14 @@ const db = firebase.database();
 
 // LOGIN
 function login(){
-firebase.auth().signInWithEmailAndPassword(email.value,password.value)
-.then(()=>{
-loginPage.style.display="none";
-dashboard.style.display="block";
-})
-.catch(()=>alert("Login gagal"));
-}
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    loginPage.style.display = "none";
+    dashboard.style.display = "block";
+  } else {
+    loginPage.style.display = "block";
+  }
+});
 
 function logout(){
 firebase.auth().signOut();
