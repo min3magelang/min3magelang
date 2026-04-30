@@ -140,6 +140,14 @@ firebase.auth().onAuthStateChanged(user => {
     loginPage.style.display = "block";
   }
 });
+firebase.auth().onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+  } else {
+    document.getElementById("loginPage").style.display = "block";
+  }
+});
 
 function logout(){
 firebase.auth().signOut();
