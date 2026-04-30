@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MIN 3 Magelang | Admin Database</title>
+  <title>MIN 3 Magelang</title>
 
-  <!-- Firebase versi compat (lebih mudah) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 
   <script>
-    // CONFIG ANDA (SUDAH DIPASANGKAN)
     const firebaseConfig = {
       apiKey: "AIzaSyDFBto9fjDbdjxfrAK8QIZAmsgiXIjU5eQ",
       authDomain: "min3magelang-c0a1a.firebaseapp.com",
@@ -26,15 +25,20 @@
 
     function tambahPengumuman() {
       let isi = document.getElementById('inputPengumuman').value;
-      if(isi.trim() === '') return alert('Isi tidak boleh kosong');
-      db.ref('pengumuman').push({ text: isi });
-      document.getElementById('inputPengumuman').value = '';
+      if (isi === "") return alert("Isi dulu!");
+
+      db.ref('pengumuman').push({
+        text: isi
+      });
+
+      document.getElementById('inputPengumuman').value = "";
     }
 
     function tampilPengumuman() {
       const list = document.getElementById('listPengumuman');
-      db.ref('pengumuman').on('value', snapshot => {
-        list.innerHTML = '';
+
+      db.ref('pengumuman').on('value', (snapshot) => {
+        list.innerHTML = "";
         snapshot.forEach(child => {
           let li = document.createElement('li');
           li.textContent = child.val().text;
@@ -54,10 +58,11 @@
     button {padding:8px 12px;}
   </style>
 </head>
+
 <body>
 
 <header>
-  <h1>Admin MIN 3 Magelang (Database Aktif)</h1>
+  <h1>MIN 3 MAGELANG</h1>
 </header>
 
 <div class="container">
