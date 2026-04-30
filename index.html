@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MIN 3 Magelang</title>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -23,6 +22,8 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+let isAdmin = false;
 
 // LOGIN
 function login() {
@@ -42,49 +43,32 @@ function logout() {
 // CEK LOGIN
 firebase.auth().onAuthStateChanged(function(user) {
   if (user) {
+    isAdmin = true;
     document.getElementById('adminPanel').style.display = 'block';
   } else {
+    isAdmin = false;
     document.getElementById('adminPanel').style.display = 'none';
   }
 });
 
-// TAMBAH PENGUMUMAN
-function tambahPengumuman() {
-  let isi = document.getElementById('inputPengumuman').value;
-  if (isi === "") return alert("Isi dulu!");
-
-  db.ref('pengumuman').push({ text: isi });
-  document.getElementById('inputPengumuman').value = "";
-}
-
-// TAMPIL PENGUMUMAN
-function tampilPengumuman() {
-  const list = document.getElementById('listPengumuman');
-
-  db.ref('pengumuman').on('value', (snapshot) => {
-    list.innerHTML = "";
-    snapshot.forEach(child => {
-      let li = document.createElement('li');
-      li.textContent = child.val().text;
-      list.appendChild(li);
-    });
-  });
-}
-
-// TAMBAH FOTO (LINK)
+// TAMBAH FOTO
 function tambahFoto() {
   const judul = document.getElementById('judulFoto').value;
   const link = document.getElementById('linkFoto').value;
 
   if (judul === "" || link === "") return alert("Isi semua!");
 
-  db.ref('galeri').push({
-    judul: judul,
-    url: link
-  });
+  db.ref('galeri').push({ judul, url: link });
 
   document.getElementById('judulFoto').value = "";
   document.getElementById('linkFoto').value = "";
+}
+
+// HAPUS FOTO
+function hapusFoto(id) {
+  if (confirm("Hapus foto ini?")) {
+    db.ref('galeri/' + id).remove();
+  }
 }
 
 // TAMPIL GALERI
@@ -96,37 +80,74 @@ function tampilGaleri() {
 
     snapshot.forEach(child => {
       const data = child.val();
+      const id = child.key;
 
-      let div = document.createElement('div');
-      div.style.marginBottom = "10px";
+      let card = document.createElement('div');
+      card.className = "foto-card";
 
       let img = document.createElement('img');
       img.src = data.url;
-      img.style.width = "150px";
-      img.style.borderRadius = "8px";
 
-      let p = document.createElement('p');
-      p.textContent = data.judul;
+      let title = document.createElement('p');
+      title.textContent = data.judul;
 
-      div.appendChild(img);
-      div.appendChild(p);
-      galeri.appendChild(div);
+      card.appendChild(img);
+      card.appendChild(title);
+
+      // tombol hapus hanya admin
+      if (isAdmin) {
+        let btn = document.createElement('button');
+        btn.textContent = "Hapus";
+        btn.onclick = () => hapusFoto(id);
+        card.appendChild(btn);
+      }
+
+      galeri.appendChild(card);
     });
   });
 }
 
-window.onload = function() {
-  tampilPengumuman();
-  tampilGaleri();
-};
+window.onload = tampilGaleri;
 </script>
 
 <style>
 body {font-family: Arial; background:#eef2f7; margin:0;}
 header {background:#1a5bb8; color:white; padding:20px; text-align:center;}
-.container {max-width:900px; margin:auto; padding:20px;}
-.card {background:white; padding:20px; border-radius:10px; margin-bottom:15px;}
-img {margin-top:5px;}
+.container {max-width:1000px; margin:auto; padding:20px;}
+.card {background:white; padding:20px; border-radius:10px; margin-bottom:20px;}
+
+#galeri {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.foto-card {
+  background:white;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.foto-card img {
+  width:100%;
+  border-radius:8px;
+}
+
+button {
+  margin-top:5px;
+  padding:5px 8px;
+  background:#d9534f;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#c9302c;
+}
 </style>
 
 </head>
@@ -148,19 +169,10 @@ img {margin-top:5px;}
 </div>
 
 <div id="adminPanel" class="card" style="display:none;">
-<h2>Tambah Pengumuman</h2>
-<input type="text" id="inputPengumuman">
-<button onclick="tambahPengumuman()">Tambah</button>
-
-<h2>Tambah Foto Galeri</h2>
+<h2>Tambah Foto</h2>
 <input type="text" id="judulFoto" placeholder="Judul foto"><br><br>
 <input type="text" id="linkFoto" placeholder="Link gambar"><br><br>
-<button onclick="tambahFoto()">Tambah Foto</button>
-</div>
-
-<div class="card">
-<h2>Pengumuman</h2>
-<ul id="listPengumuman"></ul>
+<button onclick="tambahFoto()">Tambah</button>
 </div>
 
 <div class="card">
